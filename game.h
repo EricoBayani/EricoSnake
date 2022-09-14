@@ -27,6 +27,8 @@ typedef struct RenderInfo{
     // uint32_t num_draws;
     float x_norm;
     float y_norm;
+
+    bool flash;
     
 } RenderInfo;
 

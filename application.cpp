@@ -200,7 +200,13 @@ draw different groups of shapes and stuff. This is just an idea for abstracting 
             vb.Bind();
             ib.Bind();
             GLCall(glBindVertexArray(vao));
-            GLCall(glUniform4f(color_location, r, 0.3f, 0.8f, 1.0f));
+
+            if(info.flash){
+                GLCall(glUniform4f(color_location, 0.0f, 0.0f, 0.0f, 1.0f));
+            }
+            else{
+                GLCall(glUniform4f(color_location, 0.0f, 0.3f, 0.8f, 1.0f));
+            }
             GLCall(glDrawElements(GL_TRIANGLES, info.num_shapes * info.num_verts, GL_UNSIGNED_INT, nullptr));
             //vb.Unbind();
             vb.Bind();
@@ -217,6 +223,8 @@ draw different groups of shapes and stuff. This is just an idea for abstracting 
             // update game state
             // Sleep(75);
             updateGameState(info);
+
+            
             Sleep(75);
 
         }

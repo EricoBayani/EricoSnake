@@ -30,6 +30,7 @@ static int prev_direction;
 static bool hit = false;
 static bool resetGameFlag = false;
 static bool paused = false;
+static bool dead = false;
 
 static float x_norm = 0;
 static float y_norm = 0;
@@ -209,7 +210,7 @@ RenderInfo gameSetup(void){
     
 
     RenderInfo r_info = {nullptr, vertices, indices, num_shapes, num_verts, num_indices, 
-                         new_x_norm, new_y_norm};
+                         new_x_norm, new_y_norm, false};
 
     r_info.num_shapes += 2;
     r_info.num_indices += 6;
@@ -236,6 +237,31 @@ RenderInfo gameSetup(void){
     return r_info;
 }
 
+
+bool hitBody(RenderInfo & r_info, std::vector<float> & curr_head_verts){
+
+    for(int i = 2; i < squares.size(); ++i){
+
+            Square square = squares[i];
+
+            std::vector<float> curr_square_verts =
+                {
+                 r_info.vertices[square.vert_indices[0]],
+                 r_info.vertices[square.vert_indices[1]],
+                 r_info.vertices[square.vert_indices[2]],
+                 r_info.vertices[square.vert_indices[3]],
+                 r_info.vertices[square.vert_indices[4]],
+                 r_info.vertices[square.vert_indices[5]],
+                 r_info.vertices[square.vert_indices[6]],
+                 r_info.vertices[square.vert_indices[7]]
+            };
+
+            if(curr_square_verts == curr_head_verts) return true;
+
+        }
+    
+    return false;
+}
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
@@ -295,80 +321,92 @@ void updateGameState(RenderInfo &r_info){
     };
     
     if(curr_head_verts == food_verts) hit = true;    
+
+    if(hitBody(r_info, curr_head_verts)) dead = true;
     
     if(hit) {
         generateRandomSquare(r_info);
         
     }
     // move things
-    if(!paused) {   
-        prev_direction = squares[1].my_direction;
-        squares[1].my_direction = direction;
-        for(int i = 1; i < squares.size(); ++i){
+    if(!dead){
+        if(!paused) {   
+            prev_direction = squares[1].my_direction;
+            squares[1].my_direction = direction;
+            for(int i = 1; i < squares.size(); ++i){
 
-            Square square = squares[i];
+                Square square = squares[i];
 
-            if(i == squares.size() - 1){
-                last_square_vert[0] = r_info.vertices[square.vert_indices[0]];
-                last_square_vert[1] = r_info.vertices[square.vert_indices[1]];
-                last_square_vert[2] = r_info.vertices[square.vert_indices[2]];
-                last_square_vert[3] = r_info.vertices[square.vert_indices[3]];
-                last_square_vert[4] = r_info.vertices[square.vert_indices[4]];
-                last_square_vert[5] = r_info.vertices[square.vert_indices[5]];
-                last_square_vert[6] = r_info.vertices[square.vert_indices[6]];
-                last_square_vert[7] = r_info.vertices[square.vert_indices[7]];
-            }
-            switch (square.my_direction){
-            case UP:
-                r_info.vertices[square.vert_indices[1]] += y_norm;
-                r_info.vertices[square.vert_indices[3]] += y_norm;
-                r_info.vertices[square.vert_indices[5]] += y_norm;
-                r_info.vertices[square.vert_indices[7]] += y_norm;
-                break;
-            case DOWN:
-                r_info.vertices[square.vert_indices[1]] -= y_norm;
-                r_info.vertices[square.vert_indices[3]] -= y_norm;
-                r_info.vertices[square.vert_indices[5]] -= y_norm;
-                r_info.vertices[square.vert_indices[7]] -= y_norm;        
-                break;
-            case LEFT:
-                r_info.vertices[square.vert_indices[0]] -= x_norm;
-                r_info.vertices[square.vert_indices[2]] -= x_norm;
-                r_info.vertices[square.vert_indices[4]] -= x_norm;
-                r_info.vertices[square.vert_indices[6]] -= x_norm;        
-                break;            
-            case RIGHT:
-                r_info.vertices[square.vert_indices[0]] += x_norm;
-                r_info.vertices[square.vert_indices[2]] += x_norm;
-                r_info.vertices[square.vert_indices[4]] += x_norm;
-                r_info.vertices[square.vert_indices[6]] += x_norm;        
-                break;        
-            }
+                if(i == squares.size() - 1){
+                    last_square_vert[0] = r_info.vertices[square.vert_indices[0]];
+                    last_square_vert[1] = r_info.vertices[square.vert_indices[1]];
+                    last_square_vert[2] = r_info.vertices[square.vert_indices[2]];
+                    last_square_vert[3] = r_info.vertices[square.vert_indices[3]];
+                    last_square_vert[4] = r_info.vertices[square.vert_indices[4]];
+                    last_square_vert[5] = r_info.vertices[square.vert_indices[5]];
+                    last_square_vert[6] = r_info.vertices[square.vert_indices[6]];
+                    last_square_vert[7] = r_info.vertices[square.vert_indices[7]];
+                }
+                switch (square.my_direction){
+                case UP:
+                    r_info.vertices[square.vert_indices[1]] += y_norm;
+                    r_info.vertices[square.vert_indices[3]] += y_norm;
+                    r_info.vertices[square.vert_indices[5]] += y_norm;
+                    r_info.vertices[square.vert_indices[7]] += y_norm;
+                    break;
+                case DOWN:
+                    r_info.vertices[square.vert_indices[1]] -= y_norm;
+                    r_info.vertices[square.vert_indices[3]] -= y_norm;
+                    r_info.vertices[square.vert_indices[5]] -= y_norm;
+                    r_info.vertices[square.vert_indices[7]] -= y_norm;        
+                    break;
+                case LEFT:
+                    r_info.vertices[square.vert_indices[0]] -= x_norm;
+                    r_info.vertices[square.vert_indices[2]] -= x_norm;
+                    r_info.vertices[square.vert_indices[4]] -= x_norm;
+                    r_info.vertices[square.vert_indices[6]] -= x_norm;        
+                    break;            
+                case RIGHT:
+                    r_info.vertices[square.vert_indices[0]] += x_norm;
+                    r_info.vertices[square.vert_indices[2]] += x_norm;
+                    r_info.vertices[square.vert_indices[4]] += x_norm;
+                    r_info.vertices[square.vert_indices[6]] += x_norm;        
+                    break;        
+                }
 
-            int temp = squares[i].my_direction;
-            squares[i].my_direction = prev_direction;
-            prev_direction = temp;
+                int temp = squares[i].my_direction;
+                squares[i].my_direction = prev_direction;
+                prev_direction = temp;
         
+            }
+
+        
+
+            // debug stuff
+
+            if(debug_squares > 0 || hit == true){
+                if(hit == true) {
+                    ++score;
+                    std::cout << "Score: " << score << std::endl;
+                }
+                hit = false;
+                createNewSquare(r_info);
+                debug_squares--;
+        
+            }
+
         }
 
-        // debug stuff
+    }
 
-        if(debug_squares > 0 || hit == true){
-            if(hit == true) {
-                ++score;
-                std::cout << "Score: " << score << std::endl;
-            }
-            hit = false;
-            createNewSquare(r_info);
-            debug_squares--;
-        
-        }
-
+    else {
+        r_info.flash = !r_info.flash;
     }
     
     if(resetGameFlag){
         r_info = gameSetup();
         resetGameFlag = false;
+        dead = false;
     }
 
 }
