@@ -44,6 +44,7 @@ static int debug_squares = 0;
 static uint32_t grid_size = window_width < window_height ? window_width : window_height;
 static uint32_t sections = 16;
 
+static GLFWwindow* game_window = nullptr;
 
 
 // structure of a square
@@ -384,10 +385,18 @@ void updateGameState(RenderInfo &r_info){
 
             // debug stuff
 
+            if(!game_window) game_window = r_info.window;
+            
             if(debug_squares > 0 || hit == true){
                 if(hit == true) {
                     ++score;
                     std::cout << "Score: " << score << std::endl;
+                    std::string title_and_score;
+                    title_and_score.append("Snake Score: ");
+                    title_and_score.append(std::to_string(score));
+                    glfwSetWindowTitle(game_window, title_and_score.c_str());
+                    
+                    
                 }
                 hit = false;
                 createNewSquare(r_info);
