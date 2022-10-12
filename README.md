@@ -5,4 +5,4 @@ The snake is controlled using the arrow keys.
 
 R resets the game. P pauses the game.
 
-![alt text](https://github.com/EricoBayani/EricoSnake/gifs/CppSnakeClip.gif "Snake Gameplay")
+![alt text](https://github.com/EricoBayani/EricoSnake/blob/main/gifs/CppSnakeClip.gif "Snake Gameplay")
